@@ -15,6 +15,7 @@ if nargin<1 | isempty(sublist)
         'KC10014';
         'KD3603';
         'KL10012';
+        %                 'KN7076';
         'NB8419';
         'NN8813';
         'QH10013';
@@ -46,10 +47,8 @@ fig_output = 1;
 
 
 % directory
-dirVariable = '../../behavior_variables';
-dirFig = '../../figures';
-mkdir(dirFig);
-
+dirFig = 'figures';
+dirVariable = 'behavior_variables';
 
 % setting
 list_block = {'LN','HN'};
@@ -57,10 +56,14 @@ nBlock = numel(list_block);
 
 % list_model
 list_model = {
+%         'RB_ideal';
     'RB';
-    'RL';
-    'RB_RL_weighting';
-    'RB_stay';
+%         'RB_H';
+%         'RB_K';
+        'RL';
+    %     'RB_ideal_RL_weighting';
+        'RB_RL_weighting';
+        'RB_stay';
     };
 nModel = numel(list_model);
 
@@ -74,6 +77,7 @@ nErrMag_max3 = numel(list_errMag_max3);
 
 % list_trial_after_cp
 list_trial_after_cp = [0:20];
+% list_trial_after_cp = [0:50];
 n_tac = numel(list_trial_after_cp);
 
 % list_feedback_history
@@ -483,7 +487,7 @@ if idx_fig
                 
                 legend_text = {
                     'Unstable';
-                    'High-noise';
+                    'Noisy';
                     };
                 legend(h, legend_text,...
                     'location', 'SouthEast',...
@@ -494,9 +498,9 @@ if idx_fig
                 
                 legend_text = {
                     'Model: Unstable';
-                    'Model: High-noise';
+                    'Model: Noisy';
                     'Data: Unstable';
-                    'Data: High-noise';
+                    'Data: Noisy';
                     };
                 legend(h, legend_text,...
                     'location', 'SouthEast',...
@@ -535,7 +539,7 @@ if idx_fig
     
     
     
-    %%%%% distribution %%%%%
+    %%%%% distribution: errMag=2, errMag=1 %%%%%
     switch_rate_subject = cat(3,allData.data.p_switch_errMag.LN,allData.data.p_switch_errMag.HN);
     
     text_legend = {'errMag=2', 'errMag=1'};
@@ -578,7 +582,7 @@ if idx_fig
     set(gca, 'XTick', [0:0.2:1], 'YTick', [0:0.2:1]);
     set(gca, 'fontsize', 32, 'linewidth', 4);
     xlabel('P(switch): Unstable', 'fontsize', 32);
-    ylabel('P(switch): High-noise', 'fontsize', 32);
+    ylabel('P(switch): Noisy', 'fontsize', 32);
     xlim([0,1]);
     ylim([0,1]);
     
@@ -593,6 +597,134 @@ if idx_fig
         print(figure_file,'-depsc');
         
     end
+    
+    
+    
+    %%%%% distribution: all errMag %%%%%
+    for b = 1:nBlock
+        
+        % block_name
+        block_name = list_block{b};
+        
+        % data
+        switch_rate_subject = allData.data.p_switch_errMag.(block_name);
+        
+        figure;
+        fg = fig_setting_default;
+        
+        hold on
+        for i = 1:nErrMag
+            
+            xMargin = 0.05;
+            yMargin = 0.05;
+            yData = switch_rate_subject(:,i);
+            [xOffset] = smartJitter(yData,xMargin,yMargin);
+            
+            xData = list_errMag(i) + xOffset;
+            
+            plot(xData, yData,...
+                'linestyle', 'none',...
+                'linewidth', 2,...
+                'marker', 'o',...
+                'markersize', 10,...
+                'markerfacecolor', facecolor{b},...
+                'markeredgecolor', 'k');
+            
+        end
+        hold off
+        
+        set(gca, 'fontsize', 32, 'linewidth', 4);
+        
+        xlim([list_errMag(1)-0.5, list_errMag(end)+0.5]);
+        ylim([0,1.05]);
+        
+        set(gca, 'XTick', list_errMag, 'YTick', [0:0.2:1]);
+        set(gca, 'fontsize', 32, 'linewidth', 4);
+        
+        xlabel('Error magnitude', 'fontsize', 32);
+        ylabel('P(switch)', 'fontsize', 32);
+        
+        switch block_name
+            case {'LN'}
+                title_name = 'Unstable';
+            case {'HN'}
+                title_name = 'Noisy';
+        end
+        title(title_name, 'fontsize', 32);
+        
+        % output figure
+        if fig_output
+            
+            figure_file = fullfile(dirFig,sprintf('behavior_p_switch_by_errMag_distribution_%s', block_name));
+            print(figure_file,'-depsc');
+            
+        end
+        
+        
+    end
+    
+    
+    
+    
+    %%%%% distribution: all errMag %%%%%
+    %     for b = 1:nBlock
+    %
+    %         % block_name
+    %         block_name = list_block{b};
+    %
+    %         % data
+    %         switch_rate_subject = allData.data.p_switch_errMag.(block_name);
+    %
+    %
+    %         for i = 1:nErrMag
+    %
+    %             figure;
+    %             hold on
+    %
+    %             fg = fig_setting_default;
+    %
+    %             fg.pp(3) = fg.pp(3)*0.8;
+    %             fg.pp(4) = fg.pp(4)*0.8;
+    %             set(gcf,...
+    %                 'Position',fg.pp,...
+    %                 'PaperPosition', fg.pp);
+    %
+    %             histogram(switch_rate_subject(:,i),[0:0.05:1],...
+    %                 'facecolor', facecolor{b},...
+    %                 'edgecolor', 'k',...
+    %                 'linewidth', 2);
+    %
+    %             hold off
+    %
+    %             set(gca, 'fontsize', 28, 'linewidth', 4);
+    %
+    %
+    %             xlim([0,1]);
+    %             ylim([0,16]);
+    %
+    %             set(gca,'XTick',[0:0.2:1],'YTick',[0:4:16]);
+    %
+    %             xlabel('P(switch)', 'fontsize', 28);
+    %             ylabel('Number of participants', 'fontsize', 28);
+    %
+    %             title_name = sprintf('Error magnitude = %d', list_errMag(i));
+    %             title(title_name, 'fontsize', 28);
+    %
+    %             % output figure
+    %             if fig_output
+    %
+    %                 figure_file = fullfile(dirFig,sprintf('behavior_p_switch_by_errMag_distribution_%s_errMag_%d', block_name, list_errMag(i)));
+    %                 print(figure_file,'-depsc');
+    %
+    %             end
+    %
+    %         end
+    %
+    %
+    %     end
+    
+    
+    
     
     
     
@@ -722,7 +854,7 @@ if idx_fig
                 
                 legend_text = {
                     'Unstable';
-                    'High-noise';
+                    'Noisy';
                     };
                 
                 legend(h, legend_text,...
@@ -734,9 +866,9 @@ if idx_fig
                 
                 legend_text = {
                     'Model: Unstable';
-                    'Model: High-noise';
+                    'Model: Noisy';
                     'Data: Unstable';
-                    'Data: High-noise';
+                    'Data: Noisy';
                     };
                 
                 legend(h, legend_text,...
@@ -784,9 +916,9 @@ if idx_fig
             facecolor{h} = custom_color(idx_color(h),:);
             edgecolor{h} = 'k';
             text_history = [];
-%             for i = 1:3
-%                 text_history = [text_history, sprintf('%d', list_feedback_history(h,i))];
-%             end
+            %             for i = 1:3
+            %                 text_history = [text_history, sprintf('%d', list_feedback_history(h,i))];
+            %             end
             for i = 1:3
                 if list_feedback_history(h,i)==0
                     text_history = [text_history, 'X'];
@@ -1007,7 +1139,7 @@ if idx_fig
     
     
     
-    %%%%% slope: distribution %%%%%
+    %%%%% distribution: errMag=2, errMag=1 %%%%%
     text_legend = {'errMag=2', 'errMag=1'};
     list_location = [3,2];
     nLocation = numel(list_location);
@@ -1033,7 +1165,7 @@ if idx_fig
         'linestyle', '--',...
         'linewidth', 4,...
         'color', [0.5,0.5,0.5]);
-    plot([-0.8;0.8],[-0;0],...
+    plot([-0.8;0.8],[0;0],...
         'linestyle', '--',...
         'linewidth', 4,...
         'color', [0.5,0.5,0.5]);
@@ -1055,7 +1187,7 @@ if idx_fig
     hold off
     set(gca, 'fontsize', 32, 'linewidth', 4);
     xlabel('Slope: Unstable (a. u.)', 'fontsize', 32);
-    ylabel('Slope: High-noise (a. u.)', 'fontsize', 32);
+    ylabel('Slope: Noisy (a. u.)', 'fontsize', 32);
     xlim([-0.8,0.8]);
     ylim([-0.8,0.8]);
     set(gca,'XTick',[-0.8:0.4:0.8],'YTick',[-0.8:0.4:0.8]);
@@ -1073,5 +1205,76 @@ if idx_fig
         
     end
     
+    
+    
+    
+    %%%%% distribution: all errMag %%%%%
+    facecolor = {[0.8320, 0.3672, 0],[0, 0.4453, 0.6953]};
+    for b = 1:nBlock
+        
+        % block_name
+        block_name = list_block{b};
+        
+        slope = allData.data.p_switch_error_history_by_errMag_slope.(block_name);
+        
+        figure;
+        fg = fig_setting_default;
+        
+        hold on
+        plot([list_errMag_max3(1)-0.5;list_errMag_max3(end)+0.5],[0;0],...
+            'linestyle', '--',...
+            'linewidth', 4,...
+            'color', [0.5,0.5,0.5]);
+        for i = 1:nErrMag_max3
+            
+            xMargin = 0.05;
+            yMargin = 0.1;
+            yData = slope(:,i);
+            [xOffset] = smartJitter(yData,xMargin,yMargin);
+            
+            xData = list_errMag_max3(i) + xOffset;
+            
+            plot(xData, yData,...
+                'linestyle', 'none',...
+                'linewidth', 2,...
+                'marker', 'o',...
+                'markersize', 10,...
+                'markerfacecolor', facecolor{b},...
+                'markeredgecolor', 'k');
+            
+        end
+        hold off
+        
+        set(gca, 'fontsize', 32, 'linewidth', 4);
+        
+        xlim([list_errMag_max3(1)-0.5, list_errMag_max3(end)+0.5]);
+        ylim([-1.5,1]);
+        
+        set(gca,...
+            'XTick', list_errMag_max3,...
+            'XTickLabel', {'0', '1', '2', '3+'},...
+            'YTick', [-1.5:0.5:1.5]);
+        set(gca, 'fontsize', 32, 'linewidth', 4);
+        
+        xlabel('Error magnitude', 'fontsize', 32);
+        ylabel('Slope (a. u.)', 'fontsize', 32);
+        
+        switch block_name
+            case {'LN'}
+                title_name = 'Unstable';
+            case {'HN'}
+                title_name = 'Noisy';
+        end
+        title(title_name, 'fontsize', 32);
+        
+        % output figure
+        if fig_output
+            
+            figure_file = fullfile(dirFig,sprintf('behavior_p_switch_error_history_by_errMag_slope_distribution_%s', block_name));
+            print(figure_file,'-depsc');
+            
+        end
+        
+    end
     
 end
