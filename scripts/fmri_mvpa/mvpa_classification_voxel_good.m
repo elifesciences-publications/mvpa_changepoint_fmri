@@ -24,17 +24,16 @@ end
 
 
 % directory
-dirResult = sprintf('../../%s_good', classification_method);
+dirResult = sprintf('%s_good', classification_method);
 mkdir(dirResult);
-dirBeta = '../../model_trial_lss_matlab/beta_voxel';
-dirVar = '../../behavior_variables';
+dirBeta = '../model_trial_lss_matlab/beta_voxel';
+dirVar = '../behavior_variables';
 
 % setting of classification
 switch label_type
     case {'feedback_t', 'feedback_t-1',...
             'small_error_switch',...
-            'errMag_max3_t', 'errMag_max3_t-1',...
-            'error_t_errMag_max3_t','error_t-1_errMag_max3_t-1',...
+            'errMag_max3_t',...
             'correct_t_feedback_t-1', 'error_t_feedback_t-1',...
             'certain_t_feedback_t-1', 'uncertain_t_feedback_t-1'}
         n_fold = 3;
@@ -202,50 +201,6 @@ switch label_type
             return
         end
         
-    case {'errMag_max3_t-1'}
-        label = errMag_max3_n1;
-        
-        idx_valid = ~isnan(label);
-        label = label(idx_valid);
-        triallist = triallist(idx_valid);
-        
-        if numel(unique(label))~=4
-            fprintf('not enough labels');
-            return
-        end
-        
-    case {'error_t_errMag_max3_t'}
-        label = errMag_max3;
-        
-        idx_select = (feedback==0);
-        label = label(idx_select);
-        triallist = triallist(idx_select);
-        
-        idx_valid = ~isnan(label);
-        label = label(idx_valid);
-        triallist = triallist(idx_valid);
-        
-        if numel(unique(label))~=3
-            fprintf('not enough labels');
-            return
-        end
-        
-    case {'error_t-1_errMag_max3_t-1'}
-        label = errMag_max3_n1;
-        
-        idx_select = (feedback_n1==0);
-        label = label(idx_select);
-        triallist = triallist(idx_select);
-        
-        idx_valid = ~isnan(label);
-        label = label(idx_valid);
-        triallist = triallist(idx_valid);
-        
-        if numel(unique(label))~=3
-            fprintf('not enough labels');
-            return
-        end
-        
     case {'small_error_switch'}
         label = isSwitchNext;
         
@@ -383,8 +338,10 @@ for i = 1:maxDim(1)
             
             % classification
             switch classification_method
-                case {'svm_linear'}
+                case {'svm_linear', 'svm_rbf'}
                     [acc, info] = classifier_svm(set_train, set_test, classification_method, isUnbalanced, n_fold);
+                case {'svr_linear'}
+                    [acc, info] = regression_svr(set_train, set_test, classification_method, n_fold);
             end
             acc_all(f,1) = acc;
             

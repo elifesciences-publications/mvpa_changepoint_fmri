@@ -53,9 +53,12 @@ nBlock = numel(blocklist);
 session_name = 'scan';
 
 % directory
-dirVariable = '../../behavior_variables';
-dirMLE = '../../model_mle';
+dirVariable = '../behavior_variables';
+dirMLE = '../model_mle';
 mkdir(dirMLE);
+
+
+
 
 
 % model fitting
@@ -117,7 +120,8 @@ for s = 1:nSubj
                 
                 nameParameter = {'H', 'K'};
                 lb = [0.0001, 0.0001]; % lower bound
-                ub = [0.9999, 10]; % upper bound
+%                 ub = [0.9999, 10]; % upper bound
+                ub = [0.9999, 60]; % upper bound
                 cutinterval = [5, 5]; % grid
                 nParameter = numel(cutinterval);
                 
@@ -140,7 +144,8 @@ for s = 1:nSubj
                 
                 nameParameter = {'H', 'K', 'prob_stay'};
                 lb = [0.0001, 0.0001, 0.0001]; % lower bound
-                ub = [0.9999,     10, 0.9999]; % upper bound
+%                 ub = [0.9999,     10, 0.9999]; % upper bound
+                ub = [0.9999,     60, 0.9999]; % upper bound
                 cutinterval = [5, 5, 5]; % grid
                 nParameter = numel(cutinterval);
                 
@@ -183,12 +188,12 @@ for s = 1:nSubj
                 
                 mleModel = @(x) model_RL(x, data);
                 
-                
             case {'RB_RL_weighting'} % reinforcement learning
                 
                 nameParameter = {'H', 'K', 'fixed_alpha', 'w'};
                 lb = [0.0001, 0.0001, 0.0001, 0.0001]; % lower bound
-                ub = [0.9999,     10, 0.9999, 0.9999]; % upper bound
+%                 ub = [0.9999,     10, 0.9999, 0.9999]; % upper bound
+                ub = [0.9999,     60, 0.9999, 0.9999]; % upper bound
                 cutinterval = [5, 5, 5, 5]; % grid
                 nParameter = numel(cutinterval);
                 
@@ -221,7 +226,6 @@ for s = 1:nSubj
         options = optimoptions('fmincon','Algorithm','interior-point');
         tic
         for i = 1:idx
-            %             [x, mse] = fmincon(@(x) mleModel(x), x0(i,:), [], [], [], [], lb, ub);
             [x, mse] = fmincon(@(x) mleModel(x), x0(i,:), [], [], [], [], lb, ub, [], options);
             mse_all(i,1) = mse;
             x_all(i,:) = x;

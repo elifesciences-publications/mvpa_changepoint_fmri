@@ -31,8 +31,8 @@ end
 nSub = numel(sublist);
 
 % directory
-dirVariable = '../../behavior_variables';
-dirFig = '../../figures';
+dirVariable = '../behavior_variables';
+dirFig = '../figures';
 mkdir(dirFig);
 
 % session
@@ -48,6 +48,30 @@ nErrMag = numel(list_errMag);
 list_feedback_n1 = [1, 0];
 nFeedback_n1 = numel(list_feedback_n1);
 
+list_range_errMag_n1 = [
+    0, 0;
+    1, 1;
+    2, 2;
+    3, 5;
+    ];
+nRange_errMag_n1 = size(list_range_errMag_n1,1);
+
+list_feedback_history = [
+    0,0;
+    0,1;
+    1,0;
+    1,1;
+    ];
+nHistory = size(list_feedback_history,1);
+
+legend_history = cell(nHistory,1);
+for h = 1:nHistory
+    current_history = list_feedback_history(h,:);
+    for i = 1:numel(current_history)
+        legend_history{h} = [legend_history{h}, num2str(current_history(i))];
+    end
+end
+
 list_var = {
     'cpp', 'CPP';
     'ru', 'RU';
@@ -56,7 +80,6 @@ list_var = {
     };
 nVar = size(list_var,1);
 
-% model_name = 'RB_ideal';
 model_name = 'RB';
 
 for s = 1:nSub
@@ -96,6 +119,10 @@ for s = 1:nSub
         
         feedback_all = double(errMag_all==0);
         feedback_n1_all = [NaN;feedback_all(1:end-1)];
+        feedback_n2_all = [NaN;NaN;feedback_all(1:end-2)];
+        
+        feedback_history_all = [feedback_n1_all,feedback_n2_all];
+        
         
         % keep trials with good update
         idx_goodupdate = logical([blockData.idx_goodupdate]');
@@ -106,6 +133,7 @@ for s = 1:nSub
         errMag_n1_all = errMag_n1_all(idx_goodupdate);
         feedback_all = feedback_all(idx_goodupdate);
         feedback_n1_all = feedback_n1_all(idx_goodupdate);
+        feedback_history_all = feedback_history_all(idx_goodupdate,:);
         
         
         % model_var
@@ -120,6 +148,7 @@ for s = 1:nSub
         model_var.update = update_all;
         model_var.isSwitch = isSwitch;
         model_var.legend = NaN(nTrial,1);
+        
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%% model_var vs errMag conditional on feedback_n1 %%%%%
@@ -165,7 +194,7 @@ color_block = {
     [0.8320, 0.3672, 0];
     [0, 0.4453, 0.6953]};
 
-%%%%% errMag conditional on feedback_n1 %%%%%
+% %%%%% errMag conditional on feedback_n1 %%%%%
 for v = 1:nVar
     
     % var_name
@@ -235,8 +264,8 @@ for v = 1:nVar
             legend_name = {
                 'Unstable: past correct';
                 'Unstable: past error';
-                'High-noise: past correct';
-                'High-noise: past error'};
+                'Noisy: past correct';
+                'Noisy: past error'};
             [h_legend, icons] = legend(h_line, legend_name,...
                 'fontsize', 20,...
                 'location', 'South');
@@ -276,10 +305,6 @@ for v = 1:nVar
     print(figure_file,'-depsc');
     
 end
-
-
-
-
 
 
 

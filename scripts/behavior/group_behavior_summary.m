@@ -1,7 +1,5 @@
 function allData = group_behavior_summary(sublist, session_name, idx_fig)
 
-
-
 % check the input arguments
 % subject list
 if nargin<1 | isempty(sublist)
@@ -15,7 +13,6 @@ if nargin<1 | isempty(sublist)
         'KC10014';
         'KD3603';
         'KL10012';
-        %                 'KN7076';
         'NB8419';
         'NN8813';
         'QH10013';
@@ -47,8 +44,9 @@ fig_output = 1;
 
 
 % directory
-dirFig = 'figures';
-dirVariable = 'behavior_variables';
+dirFig = '../figures';
+dirVariable = '../behavior_variables';
+mkdir(dirFig);
 
 % setting
 list_block = {'LN','HN'};
@@ -58,12 +56,9 @@ nBlock = numel(list_block);
 list_model = {
 %         'RB_ideal';
     'RB';
-%         'RB_H';
-%         'RB_K';
-        'RL';
-    %     'RB_ideal_RL_weighting';
-        'RB_RL_weighting';
-        'RB_stay';
+    'RL';
+    'RB_RL_weighting';
+    'RB_stay';
     };
 nModel = numel(list_model);
 
@@ -77,7 +72,6 @@ nErrMag_max3 = numel(list_errMag_max3);
 
 % list_trial_after_cp
 list_trial_after_cp = [0:20];
-% list_trial_after_cp = [0:50];
 n_tac = numel(list_trial_after_cp);
 
 % list_feedback_history
@@ -664,75 +658,6 @@ if idx_fig
     end
     
     
-    
-    
-    %%%%% distribution: all errMag %%%%%
-    %     for b = 1:nBlock
-    %
-    %         % block_name
-    %         block_name = list_block{b};
-    %
-    %         % data
-    %         switch_rate_subject = allData.data.p_switch_errMag.(block_name);
-    %
-    %
-    %         for i = 1:nErrMag
-    %
-    %             figure;
-    %             hold on
-    %
-    %             fg = fig_setting_default;
-    %
-    %             fg.pp(3) = fg.pp(3)*0.8;
-    %             fg.pp(4) = fg.pp(4)*0.8;
-    %             set(gcf,...
-    %                 'Position',fg.pp,...
-    %                 'PaperPosition', fg.pp);
-    %
-    %             histogram(switch_rate_subject(:,i),[0:0.05:1],...
-    %                 'facecolor', facecolor{b},...
-    %                 'edgecolor', 'k',...
-    %                 'linewidth', 2);
-    %
-    %             hold off
-    %
-    %             set(gca, 'fontsize', 28, 'linewidth', 4);
-    %
-    %
-    %             xlim([0,1]);
-    %             ylim([0,16]);
-    %
-    %             set(gca,'XTick',[0:0.2:1],'YTick',[0:4:16]);
-    %
-    %             xlabel('P(switch)', 'fontsize', 28);
-    %             ylabel('Number of participants', 'fontsize', 28);
-    %
-    %             title_name = sprintf('Error magnitude = %d', list_errMag(i));
-    %             title(title_name, 'fontsize', 28);
-    %
-    %             % output figure
-    %             if fig_output
-    %
-    %                 figure_file = fullfile(dirFig,sprintf('behavior_p_switch_by_errMag_distribution_%s_errMag_%d', block_name, list_errMag(i)));
-    %                 print(figure_file,'-depsc');
-    %
-    %             end
-    %
-    %         end
-    %
-    %
-    %     end
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%% p(best) after change-point %%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -899,11 +824,6 @@ if idx_fig
     colormap{2}(:,2) = linspace(0.4453, 0.9, 64);
     colormap{2}(:,3) = linspace(0.6953, 0.9, 64);
     
-    %     list_error_history_name = list_feedback_history;
-    %     list_error_history_name(list_feedback_history==0) = 'E';
-    %     list_error_history_name(list_feedback_history==1) = 'C';
-    %     list_error_history_name = char(list_error_history_name);
-    
     for b = 1:nBlock
         
         idx_color = round(linspace(1,64,nHistory));
@@ -916,9 +836,6 @@ if idx_fig
             facecolor{h} = custom_color(idx_color(h),:);
             edgecolor{h} = 'k';
             text_history = [];
-            %             for i = 1:3
-            %                 text_history = [text_history, sprintf('%d', list_feedback_history(h,i))];
-            %             end
             for i = 1:3
                 if list_feedback_history(h,i)==0
                     text_history = [text_history, 'X'];

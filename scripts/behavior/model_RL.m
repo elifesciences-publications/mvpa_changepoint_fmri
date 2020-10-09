@@ -47,7 +47,6 @@ end
 model_choice(end) = [];
 
 % MSE
-% choice_diff = abs(choice-model_choice);
 choice_diff = abs(choice(idx_goodchoice)-model_choice(idx_goodchoice));
 choice_diff = min(choice_diff, 10-choice_diff);
 mse = mean(choice_diff.^2);
