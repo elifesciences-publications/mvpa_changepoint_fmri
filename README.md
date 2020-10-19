@@ -1,3 +1,7 @@
+This code is associated with the paper from  Kao et al., "Neural encoding of task-dependent errors
+during adaptive learning". eLife, 2020. http://doi.org/10.7554/eLife.58809
+
+
 # mvpa_changepoint_fmri
 
 ## behavior_variables
